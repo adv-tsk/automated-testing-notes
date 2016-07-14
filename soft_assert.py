@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from contextlib import contextmanager
 from threading import local
 
 import pytest
@@ -23,15 +22,6 @@ class SoftAssertionError(AssertionError):
 
     def __str__(self):
         return '\n'.join(self.failed_assertions)
-
-
-@contextmanager
-def _soft_assert_cm():
-    """Soft assert context manager"""
-    _thread_locals.caught_asserts = []
-    yield _thread_locals.caught_asserts
-    if _thread_locals.caught_asserts:
-        raise SoftAssertionError(_thread_locals.caught_asserts)
 
 
 @pytest.yield_fixture
