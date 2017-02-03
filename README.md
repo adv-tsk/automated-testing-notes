@@ -46,4 +46,44 @@ def class_decorator(cls):
     return cls
 ```
 
+## Скриншоты при падении тестов
+
+### Первый вариант
+
+```python
+def pytest_exception_interact(node, call, report):
+    driver = node.instance.driver
+    # ...
+    allure.attach(
+        name='Скриншот',
+        contents=driver.get_screenshot_as_png(),
+        type=allure.constants.AttachmentType.PNG,
+    )
+    # ...
+```
+
+### Второй вариант
+
+```python
+import unittest
+from selenium import webdriver
+from selenium.webdriver.support.events import EventFiringWebDriver
+from selenium.webdriver.support.events import AbstractEventListener
+
+class ScreenshotListener(AbstractEventListener):
+    def on_exception(self, exception, driver):
+        screenshot_name = "exception.png"
+        driver.get_screenshot_as_file(screenshot_name)
+        print("Screenshot saved as '%s'" % screenshot_name)
+
+class TestDemo(unittest.TestCase):
+    def test_demo(self):
+
+        pjsdriver = webdriver.PhantomJS("phantomjs")
+        d = EventFiringWebDriver(pjsdriver, ScreenshotListener())
+
+        d.get("http://www.google.com")
+        d.find_element_by_css_selector("div.that-does-not-exist")
+```
+
 <a name="fn1">1</a>: [Логирование и декораторы в python](http://poliarush.com/working/development/logging-and-decorators-in-python.html)
